@@ -1,132 +1,91 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <conio.h>
 
-typedef struct stack_node {
+typedef struct node {
     int data;
     struct node *next;
-};
+} node;
+struct node *queue_head, *queue_tail;//deixnoun sthn oura kai thn korufh tou stack of
+void extract();
 
-typedef struct stack {
-    struct stack_node *top;//deikths pros
-    // ton komvo korufhs ths stoivas
-};
+bool insert(int d);
 
-void pop_from_stack(struct stack *s);
+void displayhead();
 
-bool push_in_stack(struct stack *s, int d);
-
-bool is_stack_empty(struct stack *s);
-
-int get_stack_top(struct stack *s);
-
-struct stack *create_stack();
-
-void display_stack(struct stack *s);
+bool is_empty();
 
 int main() {
-    int sel, key;
-    struct stack *mystack = create_stack();
+    char ch;
+    int price;
+    queue_head = queue_tail = NULL;//arxikopoihsh ouras kai kefalhs me keno
     while (1) {
-        printf("menu selection\n");
-        printf("--------\n");
-        printf("0. Exit\n");
-        printf("1. Insert\n");
-        printf("2. Extract\n");
-        printf("3. Display Top\n");
-        printf("4. Display All\n");
-
-        printf("enter choice : ");
-        scanf("%d", &sel);
-
-        switch (sel) {
+        printf("0. exit , 1. insert, 2. extract, 3. display head:\n");
+        ch = getch();
+        switch (ch) {
             case 0:
                 exit(0);
             case 1:
-                printf("dwse timh : ");
-                scanf("%d", &key);
-                if (!push_in_stack(mystack, key)) {
-                    printf("no available memory\n");
-                }
+                printf("dwse arithmo : ");
+                scanf("%d", &price);
+                if (insert(price) == false)
+                    puts("not available memory ");
                 break;
             case 2:
-                pop_from_stack(mystack);
+                extract();
                 break;
             case 3:
-                if (!is_stack_empty(mystack)) {
-                    printf("%d\n", get_stack_top(mystack));
-                } else {
-                    printf("empty stack\n");
-                }
-                break;
-            case 4:
-                if (!is_stack_empty(mystack)) {
-                    display_stack(mystack);
-                } else {
-                    printf("empty stack\n");
-                }
+                displayhead();
                 break;
             default:
-                printf("wrong input\n");
-                break;
+                puts("wrong key");
         }
     }
     return 0;
 }
 
-struct stack *create_stack() {
-    struct stack *st = (struct stack *) malloc(sizeof(struct stack));
-    st->top = NULL;
-    return st;
-}
-
-bool push_in_stack(struct stack *s, int d) {
-    struct stack_node *new;
-    new = (struct stack_node *) malloc(sizeof(struct stack_node));
+bool insert(int d) {
+    struct node *new;
+    new = malloc(sizeof(node));
     if (new == NULL) {
         return false;
     }
     new->data = d;
-    new->next = s->top;
-    s->top = new;
+    if (queue_tail != NULL) {
+        queue_tail->next = new;//an h oura den einai kenh, tote h oura deixnei ston neo komvo poy
+        //eisagetaI
+    }
+    new->next = NULL;//an einai kenh,o neos komvos mhdenizetai
+    queue_tail = new;//eisagwgh twrinou komvou ws oura
+    if (queue_head == NULL) {
+        queue_head = queue_tail;//an h kefali einai kenh, oi list_head kai list_tail,
+        // tha deixnoun kai oi 2 ston neo komvo
+    }
     return true;
 }
 
-void pop_from_stack(struct stack *s) {
-    struct stack_node *temp;
-    int d;
-    if (is_stack_empty(s)) {
-        printf("empty stack\n");
+void extract() {
+    struct node *temp;
+    if (is_empty()) {
+        puts("is_empty true\n");
         return;
     }
-    printf("%d popped\n", s->top->data);
-    temp = s->top->next;
-    free(s->top);
-    s->top = temp;
+    printf("eksagwgh tou stoixeioy: %d\n ",
+           queue_head->data);//skepsou to ws oura se magazi,neos pelaths prostithetai sto telos
+    //o pelaths sthn arxh eksuphreteitai kai fevgei
+    temp = queue_head->next;//kataxwrhsh tou epomenou komvou poy deixnei h kefalh sto temp
+    free(queue_head);// eksagwgh twrinou head
+    queue_head = temp;//nea kefalh, to epomeno stoixeio
 }
 
-bool is_stack_empty(struct stack *s) {
-    if (s->top == NULL) {
-        return true;
-    } else {
-        return false;
-    }
+bool is_empty() {
+    return (queue_head == NULL);//an queue_head == NULL epistrofh true
 }
 
-int get_stack_top(struct stack *s) {
-    return s->top->data;
-}
-
-void display_stack(struct stack *s) {
-    struct stack_node *p;
-    if (is_stack_empty(s)) {
-        return;
+void displayhead() {
+    if (is_empty()) {
+        puts("tail empty\n");
     }
-    p = s->top;
-    while (p)//p!=NULL
-    {
-        printf("%d ", p->data);
-        p = p->next;
-    }
-    printf("\n");
+    printf("head of queue : %d", queue_head->data);
 }
